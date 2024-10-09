@@ -4,7 +4,7 @@ const mongoosePagination = require("mongoose-pagination");
 const fs = require("fs");
 const path = require("path");
 //Importar modelo
-const User = require("../models/User");
+const User = require("../models/user");
 /* const Boleto = require("../models/Boleto.js");
 const Participante = require("../models/Participante.js");
 const Ticket = require("../models/Ticket.js"); */

@@ -230,43 +230,35 @@ const sendEmailFolios = async (req, res) => {
     }).then(async (listBol) => {
         if (!listBol) return res.status(200).send({ status: "error", message: "No hay" });
 
-        Participante.findById(params.userId).select("email").then(async (part) => {
-            let auxList = await listBol;
-            const transporter = nodemailer.createTransport({
-                host: 'smtp.hostinger.com',
-                port: 465,
-                secure: true,
-                auth: {
-                    user: 'folios@compraygana2024pds.com',
-                    pass: 'A|z$8ps2'
-                }, tls: {
-                    rejectUnauthorized: false,
-                }
-            });
-
-            let html = `<div>Registro de tus boletos</div><br/>`
-            for (let i = 0; i < auxList.length; i++) {
-                html += `<p>Folio: ${auxList[i].folio} / Numero de esferas: ${auxList[i].numSpheres}</p>`
+        let auxList = await listBol;
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.hostinger.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: 'folios@compraygana2024pds.com',
+                pass: 'A|z$8ps2'
+            }, tls: {
+                rejectUnauthorized: false,
             }
+        });
 
-            const info = await transporter.sendMail({
-                from: "'Folios' <folios@compraygana2024pds.com>",
-                to: part.email,
-                cc: 'adan.prz.7@gmail.com',
-                subject: 'Tus folios digitales de compra y gana Plaza del Sol',
-                html: html
-            });
+        let html = `<div>Registro de tus boletos</div><br/>`
+        for(let i = 0; i < auxList.length; i++){
+            html+= `<p>Folio: ${auxList[i].folio} / Numero de esferas: ${auxList[i].numSpheres}</p>`
+        }
 
-            return res.status(200).send({
-                status: "success",
-                message: "Lista",
-                info: info.messageId
-            });
-        }).catch((error) => {
-            return res.status(500).send({
-                status: "error",
-                message: "error en la consulta"
-            });
+        const info = await transporter.sendMail({
+            from: "'Folios' <folios@compraygana2024pds.com>",
+            to: 'adan.prz.7@gmail.com',
+            subject: 'Tus folios digitales de compra y gana Plaza del Sol',
+            html: html
+        });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Lista",
+            info: info.messageId
         });
     }).catch((error) => {
         return res.status(500).send({
