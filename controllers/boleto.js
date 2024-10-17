@@ -6,6 +6,10 @@ const nodemailer = require('nodemailer');
 const Boleto = require("../models/Boleto");
 const Participante = require("../models/Participante");
 
+const fs = require("fs");
+const PDFDocument = require("../libs/pdftable");
+const path = require("path");
+
 //Acciones de prueba
 const pruebaBoleto = (req, res) => {
     return res.status(200).send({
@@ -45,11 +49,11 @@ const register = async (req, res) => {
         newBoleto.parti = params.userId;
 
         newBoleto.save().then((boletoStore) => {
-            if (!boletoStore) return res.satus(400).send({ status: "error", message: "No se pudo guardar el boleto" });
+            if (!boletoStore) return res.satus(400).send({ status: "error", message: "No se pudo guardar el cupon electronico" });
 
             return res.status(200).send({
                 status: "Success",
-                message: "Boleto guardado",
+                message: "cupon electronico guardado",
                 boletoStore,
                 folio: auxFolio,
                 params
@@ -243,15 +247,15 @@ const sendEmailFolios = async (req, res) => {
             }
         });
 
-        let html = `<div>Registro de tus boletos</div><br/>`
+        let html = `<div>Registro de tus cupones electronicos</div><br/>`
         for(let i = 0; i < auxList.length; i++){
-            html+= `<p>Folio: ${auxList[i].folio} / Numero de esferas: ${auxList[i].numSpheres}</p>`
+            html+= `<p>Folio: ${auxList[i].folio} / Numero de pelotas: ${auxList[i].numSpheres}</p>`
         }
 
         const info = await transporter.sendMail({
             from: "'Folios' <folios@compraygana2024pds.com>",
             to: 'adan.prz.7@gmail.com',
-            subject: 'Tus folios digitales de compra y gana Plaza del Sol',
+            subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
             html: html
         });
 
@@ -268,6 +272,151 @@ const sendEmailFolios = async (req, res) => {
     });
 }
 
+const sendEmailFolios2 = async (req, res) => {
+    let params = req.body;
+    if (!params.userId) {
+        return res.status(400).send({
+            status: "error",
+            message: "falta el dato"
+        });
+    }
+
+    Boleto.find({
+        $and: [
+            { parti: params.userId },
+            { isFull: true }
+        ]
+    }).then(async (listBol) => {
+        if (!listBol) return res.status(200).send({ status: "error", message: "No hay" });
+
+        let auxList = await listBol;
+        const transporter = nodemailer.createTransport({
+            host: 'smtp.hostinger.com',
+            port: 465,
+            secure: true,
+            auth: {
+                user: 'folios@compraygana2024pds.com',
+                pass: 'A|z$8ps2'
+            }, tls: {
+                rejectUnauthorized: false,
+            }
+        });
+
+        let html = `<div>Registro de tus cupones electronicos</div><br/>`
+        for(let i = 0; i < auxList.length; i++){
+            html+= `<p>Folio: ${auxList[i].folio} / Numero de pelotas: ${auxList[i].numSpheres}</p>`
+        }
+
+        const info = await transporter.sendMail({
+            from: "'Folios' <folios@compraygana2024pds.com>",
+            to: 'adan.prz.7@gmail.com',
+            subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
+            html: html
+        });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Lista",
+            info: info.messageId
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
+const createPDFDinamic = (req, res) => {
+    let params = req.body;
+    if (!params.email) {
+        return res.status(400).send({
+            status: "error",
+            message: "falta el dato"
+        });
+    }
+    // Create The PDF document
+    const doc = new PDFDocument();
+    // Pipe the PDF into a patient's file
+    doc.pipe(fs.createWriteStream(`PDF/${params.email}.pdf`));
+
+    // Add the header - https://pspdfkit.com/blog/2019/generate-invoices-pdfkit-node/
+    doc
+        .image("logo.png", 50, 45, { width: 50 })
+        .fillColor("#444444")
+        .fontSize(20)
+        .text("Tus cupones digitales de compra y gana Plaza del Sol.", 110, 57)
+        .fontSize(10)
+        .moveDown();
+
+    // Create the table - https://www.andronio.me/2017/09/02/pdfkit-tables/
+    const table = {
+        headers: ["Folio", "#"],
+        rows: []
+    };
+
+    /* Participante.find({email: params.email}).select("email isFull qrCode namePart phone surname").then(async (auxPart) => {
+        if (!auxPart) return res.status(404).send({ status: "error", message: "No encontrado" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Econtrado",
+            part,
+            auxPart
+        });
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    }); */
+
+    Boleto.find({
+        $and: [
+            { parti: params.userId },
+            { isFull: true }
+        ]
+    }).then(async (listBol) => {
+        if (!listBol) return res.status(200).send({ status: "error", message: "No hay" });
+
+        // Add the patients to the table
+        for (const bol of listBol) {
+            table.rows.push([bol.folio, bol.numSpheres])
+        }
+
+        // Draw the table
+        doc.moveDown().table(table, 10, 125, { width: 590 });
+
+        // Finalize the PDF and end the stream
+        doc.end();
+        return res.status(200).send({
+            status: "success",
+            message: "Hecho"
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
+const getPDF = (req, res) => {
+    /* let params = req.body;
+    if (!params.email) {
+        return res.status(400).send({
+            status: "error",
+            message: "falta el dato"
+        });
+    } */
+    const filePath = `PDF/adan.prz.7@gmail.com.pdf`;
+    fs.stat(filePath, (error, exists) => {
+        if (!exists) return res.status(404).send({ status: "error", message: "No existe el archivo" });
+        //Devolver un file
+        return res.sendFile(path.resolve(filePath));
+    })
+}
 
 module.exports = {
     pruebaBoleto,
@@ -277,5 +426,7 @@ module.exports = {
     getNumberBol,
     getAllByIdFalse,
     getAllByIdTrue,
-    sendEmailFolios
+    sendEmailFolios,
+    getPDF,
+    createPDFDinamic
 }

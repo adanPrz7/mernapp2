@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const path = require("path");
 
+
 //Mensaje de bienvenida
 console.log("API NODE was started");
 
@@ -35,7 +36,7 @@ app.use("/api/participante", ParticipanteRouter);
 app.use("/api/boleto", BoletoRoutes);
 app.use("/api/ticket", TicketRouter);
 
-app.get("*", (req, res, next)=>{
+app.get("*", (req, res, next) =>{
     return res.sendFile(path.resolve("dist/index.html"));
 });
 

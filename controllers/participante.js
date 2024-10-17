@@ -104,6 +104,31 @@ const getParticipante = (req, res) => {
     });
 }
 
+const getParticipanteByEmail = (req, res) => {
+    let params = req.body;
+
+    if (!params.email) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.findOne({ $and: [
+        { email: params.email },
+        { isFull: true }
+    ]}).select("phone email isFull").then(async (part) => {
+        if (!part) return res.status(404).send({ status: "error", message: "No encontrado" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Econtrado",
+            part
+        });
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 const addNames = (req, res) => {
     let params = req.body;
 
@@ -174,6 +199,49 @@ const getAllParticipante = (req, res) => {
     });
 }
 
+const getAllParticipantes = (req, res) => {
+    let params = req.body;
+    if (!params.userId) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.findById(params.userId).select("email isFull qrCode namePart phone surname _id").then(async (part) => {
+        if (!part) return res.status(404).send({ status: "error", message: "No encontrado" });
+
+
+        Participante.find({$and: [
+            {email: part.email},
+            {_id: {$ne: part._id}},
+        ]}
+        ).select("email isFull qrCode namePart phone surname").then(async (auxPart) => {
+            if (!auxPart) return res.status(404).send({ status: "error", message: "No encontrado" });
+    
+            return res.status(200).send({
+                status: "success",
+                message: "Econtrado",
+                part,
+                auxPart
+            });
+    
+        }).catch((error) => {
+            return res.status(500).send({
+                status: "error",
+                message: "error en la consulta"
+            });
+        });
+
+        /* return res.status(200).send({
+            status: "success",
+            message: "Econtrado",
+            part
+        }); */
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 const getParticipantes = (req, res) => {
     let params = req.body;
 
@@ -221,8 +289,10 @@ const sendEmailQr = async (req, res) => {
         const imageBase64Content = params.imgB;
         const html = `<div>Ingresa a las siguientes ligas para descargar la App de Plaza del Sol y poder leer tu codigo QR</div>
         <br/>
-        <a href="https://play.google.com/store/apps/details?id=com.plazadelsol.app">Android</a>
-        <a href="https://apps.apple.com/mx/app/plaza-del-sol-app/id1548986329">IOS</a>
+        <a href="https://play.google.com/store/apps/details?id=com.plazadelsol.app" style="text-decoration: none;background: #a4c639;padding: 10px;border-radius: 16px;border-right: 5px;">Android</a>
+        <a href="https://apps.apple.com/mx/app/plaza-del-sol-app/id1548986329" style="text-decoration: none;background: #33c1ff;padding: 10px;border-radius: 16px;">IOS</a>
+        <br/>
+        <br/>
         <br/>
         Tu código QR: <br/>
         <img src="cid:unique@nodemailer.com" alt="Red dot"/>
@@ -231,7 +301,7 @@ const sendEmailQr = async (req, res) => {
         const info = await transporter.sendMail({
             from: "'Folios' <folios@compraygana2024pds.com>",
             to: part.email,
-            subject: 'Tus cupones digitales de compra y gana Plaza del Sol',
+            subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
             html: html,
             attachments: [{
                   cid: "unique@nodemailer.com",
@@ -264,5 +334,7 @@ module.exports = {
     getParticipante,
     getAllParticipante,
     getParticipantes,
-    sendEmailQr
+    sendEmailQr,
+    getParticipanteByEmail,
+    getAllParticipantes
 }
