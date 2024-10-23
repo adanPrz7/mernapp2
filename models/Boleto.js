@@ -24,7 +24,10 @@ const BoletoSchema = Schema({
     parti:{
         type: Schema.ObjectId,
         ref: "Participante"
-    }
+    },
+    namePart: String,
+    surname: String,
+
 });
 
 module.exports = model("Boleto", BoletoSchema,"boletos");

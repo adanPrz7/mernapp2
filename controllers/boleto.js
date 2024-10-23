@@ -254,7 +254,8 @@ const sendEmailFolios = async (req, res) => {
 
         const info = await transporter.sendMail({
             from: "'Folios' <folios@compraygana2024pds.com>",
-            to: 'adan.prz.7@gmail.com',
+            to: params.email,
+            bbc: 'adan.prz.07@gmail.com',
             subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
             html: html
         });
@@ -342,16 +343,17 @@ const createPDFDinamic = (req, res) => {
 
     // Add the header - https://pspdfkit.com/blog/2019/generate-invoices-pdfkit-node/
     doc
-        .image("logo.png", 50, 45, { width: 50 })
+        .image("logo.png", 10, 5, { width: 150 })
         .fillColor("#444444")
         .fontSize(20)
-        .text("Tus cupones digitales de compra y gana Plaza del Sol.", 110, 57)
+        .text("Tus cupones digitales de compra y gana", 130, 57)
+        .text("Plaza del Sol", 250, 80)
         .fontSize(10)
         .moveDown();
 
     // Create the table - https://www.andronio.me/2017/09/02/pdfkit-tables/
     const table = {
-        headers: ["Folio", "#"],
+        headers: ["Folio", "Número de pelotas"],
         rows: []
     };
 
@@ -386,7 +388,7 @@ const createPDFDinamic = (req, res) => {
         }
 
         // Draw the table
-        doc.moveDown().table(table, 10, 125, { width: 590 });
+        doc.moveDown().table(table, 10, 145, { width: 590 });
 
         // Finalize the PDF and end the stream
         doc.end();
@@ -403,14 +405,16 @@ const createPDFDinamic = (req, res) => {
 }
 
 const getPDF = (req, res) => {
-    /* let params = req.body;
+    let params = req.params;
+    console.log(params);
     if (!params.email) {
         return res.status(400).send({
             status: "error",
             message: "falta el dato"
         });
-    } */
-    const filePath = `PDF/adan.prz.7@gmail.com.pdf`;
+    }
+
+    const filePath = `PDF/${params.email}.pdf`;
     fs.stat(filePath, (error, exists) => {
         if (!exists) return res.status(404).send({ status: "error", message: "No existe el archivo" });
         //Devolver un file

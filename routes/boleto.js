@@ -13,7 +13,7 @@ router.post("/getAllByIdF", Boleto.getAllByIdFalse);
 router.post("/getAllByIdT", Boleto.getAllByIdTrue);
 router.post("/sendEmailFolios", Boleto.sendEmailFolios);
 router.post("/PDF", Boleto.createPDFDinamic);
-router.get("/getPDF", Boleto.getPDF);
+router.get("/getPDF/:email?", Boleto.getPDF);
 
 //Exportar el router
 module.exports = router;

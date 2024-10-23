@@ -3,8 +3,8 @@ const connection = require("./database/connection");
 const express = require("express");
 const cors = require("cors");
 
+//
 const path = require("path");
-
 
 //Mensaje de bienvenida
 console.log("API NODE was started");
@@ -30,12 +30,15 @@ const ParticipanteRouter = require("./routes/participante");
 const BoletoRoutes = require("./routes/boleto");
 const TicketRouter = require("./routes/tickets");
 
+//
 app.use("/", express.static('dist', {redirect: false}));
+
 app.use("/api/user", UserRouter);
 app.use("/api/participante", ParticipanteRouter);
 app.use("/api/boleto", BoletoRoutes);
 app.use("/api/ticket", TicketRouter);
 
+//
 app.get("*", (req, res, next) =>{
     return res.sendFile(path.resolve("dist/index.html"));
 });
