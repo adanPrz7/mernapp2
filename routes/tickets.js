@@ -7,6 +7,7 @@ const check = require("../middlewares/auth");
 router.get("/prueba", Ticket.pruebaTickets);
 router.post("/add", check.auth, Ticket.addTicket);
 router.post("/getTicketsUI", check.auth, Ticket.getTicketsByUId);
+router.delete("/deleteMany", check.auth, Ticket.deleteTickets);
 //router.post("/register", check.auth, Participante.register);
 
 //Exportar el router

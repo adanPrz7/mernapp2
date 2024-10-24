@@ -109,10 +109,12 @@ const getParticipanteByEmail = (req, res) => {
 
     if (!params.email) return res.status(400).send({ status: "error", message: "Falta informacion" });
 
-    Participante.findOne({ $and: [
-        { email: params.email },
-        { isFull: true }
-    ]}).select("phone email isFull").then(async (part) => {
+    Participante.findOne({
+        $and: [
+            { email: params.email },
+            { isFull: true }
+        ]
+    }).select("phone email isFull").then(async (part) => {
         if (!part) return res.status(404).send({ status: "error", message: "No encontrado" });
 
         return res.status(200).send({
@@ -207,20 +209,22 @@ const getAllParticipantes = (req, res) => {
         if (!part) return res.status(404).send({ status: "error", message: "No encontrado" });
 
 
-        Participante.find({$and: [
-            {email: part.email},
-            {_id: {$ne: part._id}},
-        ]}
+        Participante.find({
+            $and: [
+                { email: part.email },
+                { _id: { $ne: part._id } },
+            ]
+        }
         ).select("email isFull qrCode namePart phone surname").then(async (auxPart) => {
             if (!auxPart) return res.status(404).send({ status: "error", message: "No encontrado" });
-    
+
             return res.status(200).send({
                 status: "success",
                 message: "Econtrado",
                 part,
                 auxPart
             });
-    
+
         }).catch((error) => {
             return res.status(500).send({
                 status: "error",
@@ -283,9 +287,9 @@ const sendEmailQr = async (req, res) => {
                 rejectUnauthorized: false,
             }
         });
-    
-    
-    
+
+
+
         const imageBase64Content = params.imgB;
         const html = `<div>Ingresa a las siguientes ligas para descargar la App de Plaza del Sol y poder leer tu codigo QR</div>
         <br/>
@@ -297,19 +301,19 @@ const sendEmailQr = async (req, res) => {
         Tu código QR: <br/>
         <img src="cid:unique@nodemailer.com" alt="Red dot"/>
         `
-    
+
         const info = await transporter.sendMail({
             from: "'Folios' <folios@compraygana2024pds.com>",
             to: part.email,
             subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
             html: html,
             attachments: [{
-                  cid: "unique@nodemailer.com",
-                  filename: 'my-image.png',
-                  content: Buffer.from(imageBase64Content, 'base64'),
-                  contentDisposition: 'inline',
-                },
-              ],
+                cid: "unique@nodemailer.com",
+                filename: 'my-image.png',
+                content: Buffer.from(imageBase64Content, 'base64'),
+                contentDisposition: 'inline',
+            },
+            ],
         });
 
         return res.status(200).send({
@@ -326,6 +330,28 @@ const sendEmailQr = async (req, res) => {
     });
 }
 
+const deleteParti = async (req, res) => {
+    let params = req.body;
+    console.log(params);
+    if (!params.idParti) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.deleteOne({"_id": params.idParti}).then((partiDelete) => {
+        if (!partiDelete) return res.status(500).send({ status: "error", message: "No se pudo eliminar el participante" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Eliminado",
+            info: params
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+
+}
+
 module.exports = {
     pruebaParticipante,
     register,
@@ -336,5 +362,6 @@ module.exports = {
     getParticipantes,
     sendEmailQr,
     getParticipanteByEmail,
-    getAllParticipantes
+    getAllParticipantes,
+    deleteParti
 }

@@ -57,8 +57,37 @@ const getTicketsByUId = (req, res) =>{
     })
 }
 
+const deleteTickets = (req, res) =>{
+    let params = req.body;
+
+    if(!params.idParti){
+        return res.status(400).send({
+            status: "error",
+            message: "Faltan datos por ingresar"
+        });
+    }
+
+    Ticket.deleteMany({"parti": params.idParti}).then((ticketsDeleted) => {
+        if (!ticketsDeleted) return res.status(500).send({ status: "error", message: "No se pudo eliminar el participante" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Eliminado",
+            info: params
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+
+
+}
+
 module.exports = {
     pruebaTickets,
     addTicket,
-    getTicketsByUId
+    getTicketsByUId,
+    deleteTickets
 }

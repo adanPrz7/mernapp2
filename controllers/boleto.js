@@ -422,6 +422,31 @@ const getPDF = (req, res) => {
     })
 }
 
+const deleteMany = (req, res) =>{
+    let params = req.body;
+
+    if(!params.idParti){
+        return res.status(400).send({
+            status: "error",
+            message: "Faltan datos por ingresar"
+        });
+    }
+
+    Boleto.deleteMany({"parti": params.idParti}).then((boletosDeleted) => {
+        if (!boletosDeleted) return res.status(500).send({ status: "error", message: "No se pudo eliminar el participante" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Eliminado",
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaBoleto,
     register,
@@ -432,5 +457,6 @@ module.exports = {
     getAllByIdTrue,
     sendEmailFolios,
     getPDF,
-    createPDFDinamic
+    createPDFDinamic,
+    deleteMany
 }
