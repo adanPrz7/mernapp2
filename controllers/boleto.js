@@ -24,7 +24,7 @@ const register = async (req, res) => {
     let params = req.body;
 
     //Comprobador que llegan los datos bien
-    if (!params.userId) {
+    if (!params.parti) {
         return res.status(400).json({
             message: "Es necesario el usuario",
             status: "error"
@@ -46,7 +46,7 @@ const register = async (req, res) => {
         }); */
         params.folio = auxFolio;
         let newBoleto = new Boleto(params);
-        newBoleto.parti = params.userId;
+        //newBoleto.parti = params.userId;
 
         newBoleto.save().then((boletoStore) => {
             if (!boletoStore) return res.satus(400).send({ status: "error", message: "No se pudo guardar el cupon electronico" });
@@ -348,12 +348,11 @@ const createPDFDinamic = (req, res) => {
         .fontSize(20)
         .text("Tus cupones digitales de compra y gana", 130, 57)
         .text("Plaza del Sol", 250, 80)
-        .fontSize(10)
         .moveDown();
 
     // Create the table - https://www.andronio.me/2017/09/02/pdfkit-tables/
     const table = {
-        headers: ["Folio", "Número de pelotas"],
+        headers: ["Folio","Nombre de registro", "Número de pelotas"],
         rows: []
     };
 
@@ -376,7 +375,7 @@ const createPDFDinamic = (req, res) => {
 
     Boleto.find({
         $and: [
-            { parti: params.userId },
+            { email: params.email },
             { isFull: true }
         ]
     }).then(async (listBol) => {
@@ -384,11 +383,15 @@ const createPDFDinamic = (req, res) => {
 
         // Add the patients to the table
         for (const bol of listBol) {
-            table.rows.push([bol.folio, bol.numSpheres])
+            table.rows.push([bol.folio, bol.namePart + " " + bol.surname, bol.numSpheres]);
         }
 
+        doc
+        .fontSize(12)
+        .text("Correo electrónico: " + listBol[0].email, 200, 110)
+        .text("Teléfono: " + listBol[0].phone, 200, 130)
         // Draw the table
-        doc.moveDown().table(table, 10, 145, { width: 590 });
+        doc.moveDown().table(table, 10, 160, { width: 590 });
 
         // Finalize the PDF and end the stream
         doc.end();

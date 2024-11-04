@@ -27,7 +27,11 @@ const BoletoSchema = Schema({
     },
     namePart: String,
     surname: String,
-
+    email:{
+        type: String,
+        require: true
+    },
+    phone:String,
 });
 
 module.exports = model("Boleto", BoletoSchema,"boletos");

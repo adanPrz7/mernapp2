@@ -81,7 +81,27 @@ const deleteTickets = (req, res) =>{
             message: "error en la consulta"
         });
     });
+}
 
+const deleteO = async (req, res) => {
+    let params = req.body;
+    console.log(params);
+    if (!params._id) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Ticket.deleteOne({"_id": params._id}).then((ticketDeleted) => {
+        if (!ticketDeleted) return res.status(500).send({ status: "error", message: "No se pudo eliminar el ticket" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Eliminado",
+            info: params
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
 
 }
 
@@ -89,5 +109,6 @@ module.exports = {
     pruebaTickets,
     addTicket,
     getTicketsByUId,
-    deleteTickets
+    deleteTickets,
+    deleteO
 }
