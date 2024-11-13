@@ -12,6 +12,10 @@ const ParticipanteSchema = Schema({
     ticketsAssigned:Number,
     money:Schema.Types.Decimal128,
     qrCode:String,
+    userRef:{
+        type: Schema.ObjectId,
+        ref: "User"
+    },
     isFull: {
         type: Boolean,
         default: false

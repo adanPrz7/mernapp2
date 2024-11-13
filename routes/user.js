@@ -18,7 +18,7 @@ const uploads = multer({storage});
 
 //Definir rutas
 //router.get("/prueba-usuario", check.auth, UserController.pruebaUser);
-router.post("/register", UserController.register);
+router.post("/register", check.auth, UserController.register);
 router.post("/login", UserController.login);
 router.post("/getPerfil", check.auth, UserController.profile);
 /*router.get("/profile/:id", check.auth, UserController.profile);

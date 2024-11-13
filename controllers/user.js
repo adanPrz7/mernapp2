@@ -28,7 +28,7 @@ const register = (req, res) => {
     let params = req.body;
 
     //Comprobador que llegan los datos bien
-    if (!params.nameUser || !params.surname || !params.email || !params.password) {
+    if (!params.nameUser || !params.surname || !params.email || !params.password || !params.role) {
         return res.status(400).json({
             message: "Faltan datos por enviar",
             status: "error"
@@ -87,15 +87,16 @@ const login = (req, res) => {
             }
             //Devolver token
             const token = jwt.createToken(user);
-            console.log(jwt.secret);
-
+            //console.log(jwt.secret);
             //Devolver datos del usuario
+            let role = user.role == "Admin" ? "67343d953ac5007d4f7f13fc" : "67343f8d3ac5007d4f7f13ff";
             return res.status(200).send({
                 status: "success",
                 message: "Te has identificado correctamente",
                 user: {
                     id: user._id,
                     name: user.name,
+                    role: role
                 },
                 token
             })

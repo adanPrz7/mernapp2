@@ -19,7 +19,7 @@ const UserSchema = Schema({
     },
     role:{
         type: String,
-        default: "Admin"
+        require: true
     },
     image:{
         type: String,
