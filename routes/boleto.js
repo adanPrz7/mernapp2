@@ -10,6 +10,7 @@ router.post("/update", Boleto.updateBol);
 router.post("/getNext", Boleto.getNextBol);
 router.post("/getNumberBol", Boleto.getNumberBol);
 router.post("/getAllByIdF", Boleto.getAllByIdFalse);
+router.get("/getAllK", check.auth, Boleto.getAllK);
 router.post("/getAllByIdT", Boleto.getAllByIdTrue);
 router.post("/sendEmailFolios", Boleto.sendEmailFolios);
 router.post("/PDF", Boleto.createPDFDinamic);

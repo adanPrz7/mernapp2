@@ -450,6 +450,22 @@ const deleteMany = (req, res) =>{
     });
 }
 
+const getAllK = (req, res) =>{
+    Boleto.find().then( async (boletosList) => {
+        if (!boletosList) return res.status(500).send({ status: "error", message: "No existen" });
+
+        return res.status(200).send({
+            status: "success",
+            boletosList: boletosList
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaBoleto,
     register,
@@ -461,5 +477,6 @@ module.exports = {
     sendEmailFolios,
     getPDF,
     createPDFDinamic,
-    deleteMany
+    deleteMany,
+    getAllK
 }
