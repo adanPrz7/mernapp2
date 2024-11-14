@@ -255,7 +255,7 @@ const sendEmailFolios = async (req, res) => {
         const info = await transporter.sendMail({
             from: "'Folios' <folios@compraygana2024pds.com>",
             to: params.email,
-            bbc: 'adan.prz.07@gmail.com',
+            bbc: 'compraygana@compraygana2024pds.com',
             subject: 'Tus cupones digitales de compra y gana - Plaza del Sol',
             html: html
         });
