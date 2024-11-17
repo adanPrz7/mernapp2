@@ -16,6 +16,8 @@ router.post("/sendEmailFolios", Boleto.sendEmailFolios);
 router.post("/PDF", Boleto.createPDFDinamic);
 router.get("/getPDF/:email?", Boleto.getPDF);
 router.delete("/deleteMany", check.auth, Boleto.deleteMany);
+router.post("/getBoletosBypart", Boleto.getBoletosBypart);
+router.post("/registerOne", Boleto.registerOne);
 
 //Exportar el router
 module.exports = router;

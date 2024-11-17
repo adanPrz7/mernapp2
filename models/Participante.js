@@ -10,6 +10,8 @@ const ParticipanteSchema = Schema({
     phone:String,
     ticketCount:Number,
     ticketsAssigned:Number,
+    ticketStart:Number,
+    ticketEnd:Number,
     money:Schema.Types.Decimal128,
     qrCode:String,
     userRef:{

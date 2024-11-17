@@ -352,6 +352,28 @@ const deleteParti = async (req, res) => {
 
 }
 
+const getCounters = (req, res) => {
+    let params = req.body;
+
+    if (!params._id) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.findById(params._id).select("ticketsAssigned ticketEnd ticketStart").then(async (part) => {
+        if (!part) return res.status(404).send({ status: "error", message: "No encontrado" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Econtrado",
+            part
+        });
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaParticipante,
     register,
@@ -363,5 +385,6 @@ module.exports = {
     sendEmailQr,
     getParticipanteByEmail,
     getAllParticipantes,
-    deleteParti
+    deleteParti,
+    getCounters
 }

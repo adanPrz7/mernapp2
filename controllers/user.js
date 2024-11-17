@@ -78,7 +78,7 @@ const login = (req, res) => {
         //.select({"password":0})
         .then((user) => {
             if (!user) return res.status(404).send({ status: "Error", message: "No te has identificado correctamente" });
-            if(user.role == "Modulo"){
+            if(user.role != "Admin"){
                 let time = new Date().toLocaleString('es-MX', {hour: '2-digit', hour12: false});
                 if(time <= 11 || time >= 20)
                     return res.status(404).send({ status: "Error", message: "No te has identificado correctamente" });

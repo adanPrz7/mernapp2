@@ -466,6 +466,80 @@ const getAllK = (req, res) =>{
     });
 }
 
+const getBoletosBypart = (req, res) =>{
+    let params = req.body;
+
+    if(!params._id){
+        return res.status(400).send({
+            status: "error",
+            message: "Faltan datos por ingresar"
+        });
+    }
+
+    Boleto.find({parti: params._id}).then(async (boletosStore) =>{
+        if(!boletosStore) return res.status(500).send({ status: "error", message: "No existen" });
+
+        return res.status(200).send({
+            status: "success",
+            boletosCount: boletosStore.length
+        }); 
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
+//Registro de boleto
+const registerOne = async (req, res) => {
+    //Obtener los datos
+    let params = req.body;
+
+    //Comprobador que llegan los datos bien
+    if (!params.parti || !params.fol) {
+        return res.status(400).json({
+            message: "Es necesario el usuario",
+            status: "error"
+        });
+    }
+
+    let total = "0000000".concat((params.fol));
+    let auxFolio = total.substring(total.length - 6);
+
+    Boleto.find({ folio: auxFolio }).then(async (boleto) => {
+        if (boleto && boleto.length >= 1) return res.status(400).send({ status: "error", message: "Ya existe un folio" });
+
+        /* return res.status(200).send({
+            status: "Success",
+            message: "Boleto was saved",
+            folio: auxFolio,
+            params,
+            boleto
+        }); */
+        params.folio = auxFolio;
+        let newBoleto = new Boleto(params);
+        //newBoleto.parti = params.userId;
+
+        newBoleto.save().then((boletoStore) => {
+            if (!boletoStore) return res.satus(400).send({ status: "error", message: "No se pudo guardar el cupon electronico" });
+
+            return res.status(200).send({
+                status: "Success",
+                message: "cupon electronico guardado",
+                boletoStore,
+                folio: auxFolio,
+                params
+            });
+        }).catch((error) => {
+            return res.status(500).send({
+                status: "error",
+                message: "error en la consulta"
+            });
+        });
+    });
+}
+
 module.exports = {
     pruebaBoleto,
     register,
@@ -478,5 +552,7 @@ module.exports = {
     getPDF,
     createPDFDinamic,
     deleteMany,
-    getAllK
+    getAllK,
+    getBoletosBypart,
+    registerOne
 }

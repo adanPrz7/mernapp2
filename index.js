@@ -29,6 +29,7 @@ const UserRouter = require("./routes/user");
 const ParticipanteRouter = require("./routes/participante");
 const BoletoRoutes = require("./routes/boleto");
 const TicketRouter = require("./routes/tickets");
+const ContadorRouter = require("./routes/contador");
 
 //
 app.use("/", express.static('dist', {redirect: false}));
@@ -37,6 +38,7 @@ app.use("/api/user", UserRouter);
 app.use("/api/participante", ParticipanteRouter);
 app.use("/api/boleto", BoletoRoutes);
 app.use("/api/ticket", TicketRouter);
+app.use("/api/contador", ContadorRouter);
 
 //
 app.get("*", (req, res, next) =>{
