@@ -105,10 +105,27 @@ const deleteO = async (req, res) => {
 
 }
 
+const getTicketsList = async (req, res) =>{
+    Ticket.find().then((ticketsList) =>{
+        if (!ticketsList) return res.status(500).send({ status: "error", message: "No hay tickets" });
+
+        return res.status(200).send({
+            status: "success",
+            ticketsList
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaTickets,
     addTicket,
     getTicketsByUId,
     deleteTickets,
-    deleteO
+    deleteO,
+    getTicketsList
 }
