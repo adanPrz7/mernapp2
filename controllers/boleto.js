@@ -100,6 +100,38 @@ const updateBol = (req, res) => {
     });
 }
 
+const updateBol2 = (req, res) => {
+    let params = req.body;
+
+    if (!params.surname || !params.namePart || !params.bolId) {
+        return res.status(400).send({
+            status: "error",
+            message: "faltan datos"
+        });
+    }
+
+    //Participante.findByIdAndUpdate({ _id: params.userId }, params, { new: true }).then(async (partiUpdate) => {
+    Boleto.findOneAndUpdate({
+        $and: [
+            { _id: params.bolId },
+            { isFull: true }
+        ]
+    }, params, { new: true }).then(async (boletoStore) => {
+        if (!boletoStore) return res.status(400).send({ status: "error", message: "Error al actualizar" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Bol was update",
+            boletoStore
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 const getNextBol = (req, res) => {
     let params = req.body;
 
@@ -554,5 +586,6 @@ module.exports = {
     deleteMany,
     getAllK,
     getBoletosBypart,
-    registerOne
+    registerOne,
+    updateBol2
 }

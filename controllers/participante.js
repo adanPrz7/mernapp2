@@ -374,6 +374,33 @@ const getCounters = (req, res) => {
     });
 }
 
+const getParticipanteRepeat = (req, res) =>{
+    let params = req.body;
+
+    if (!params.email) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.find({ email: params.email }).then(async (partList) => {
+        if (!partList) {
+            return res.status(400).send({
+                status: "error",
+                message: "No hay"
+            });
+        }
+
+        return res.status(200).send({
+            status: "success",
+            message: "Qr was added",
+            partList
+        });
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaParticipante,
     register,
@@ -386,5 +413,6 @@ module.exports = {
     getParticipanteByEmail,
     getAllParticipantes,
     deleteParti,
-    getCounters
+    getCounters,
+    getParticipanteRepeat
 }

@@ -7,6 +7,7 @@ const check = require("../middlewares/auth");
 router.get("/prueba", Boleto.pruebaBoleto);
 router.post("/register", check.auth, Boleto.register);
 router.post("/update", Boleto.updateBol);
+router.post("/update2", Boleto.updateBol2);
 router.post("/getNext", Boleto.getNextBol);
 router.post("/getNumberBol", Boleto.getNumberBol);
 router.post("/getAllByIdF", Boleto.getAllByIdFalse);

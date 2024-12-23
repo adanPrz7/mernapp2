@@ -16,6 +16,7 @@ router.post("/sendEmailQr", check.auth, Participante.sendEmailQr);
 router.post("/getParticipanteByEmail", Participante.getParticipanteByEmail);
 router.delete("/deleteParti", check.auth, Participante.deleteParti);
 router.post("/getCounters", Participante.getCounters);
+router.post("/getParticipanteRepeat", check.auth, Participante.getParticipanteRepeat);
 /* router.post("/save", check.auth, FollowController.save);
 router.delete("/unfollow/:id", check.auth, FollowController.unfollow);
 router.get("/following/:id?/:page?", check.auth, FollowController.following);
