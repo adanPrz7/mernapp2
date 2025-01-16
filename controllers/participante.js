@@ -268,6 +268,28 @@ const getParticipantes = (req, res) => {
     });
 }
 
+const getParticipantesMail = (req, res) => {
+    let params = req.body;
+
+    //if (!params.userId) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    Participante.find().select("email isFull").then(async (partList) => {
+        if (!partList) return res.status(404).send({ status: "error", message: "No hay participantes" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "Econtrado",
+            partList
+        });
+
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 const sendEmailQr = async (req, res) => {
     let params = req.body;
 
@@ -335,7 +357,7 @@ const deleteParti = async (req, res) => {
     console.log(params);
     if (!params.idParti) return res.status(400).send({ status: "error", message: "Falta informacion" });
 
-    Participante.deleteOne({"_id": params.idParti}).then((partiDelete) => {
+    Participante.deleteOne({ "_id": params.idParti }).then((partiDelete) => {
         if (!partiDelete) return res.status(500).send({ status: "error", message: "No se pudo eliminar el participante" });
 
         return res.status(200).send({
@@ -374,7 +396,7 @@ const getCounters = (req, res) => {
     });
 }
 
-const getParticipanteRepeat = (req, res) =>{
+const getParticipanteRepeat = (req, res) => {
     let params = req.body;
 
     if (!params.email) return res.status(400).send({ status: "error", message: "Falta informacion" });
@@ -401,6 +423,49 @@ const getParticipanteRepeat = (req, res) =>{
     });
 }
 
+const sendEmail = async (req, res) => {
+    let params = req.body;
+
+    if (!params.cuerpo) return res.status(400).send({ status: "error", message: "Falta informacion" });
+
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.hostinger.com',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'folios@compraygana2024pds.com',
+            pass: 'A|z$8ps2'
+        }, tls: {
+            rejectUnauthorized: false,
+        }
+    });
+
+
+    let aux = params.cuerpo.split('\n');
+    let auxCuerpo = '';
+    for (let i = 0; i < aux.length; i++) {
+        auxCuerpo += `${aux[i]}</br>`;
+    }
+    let html = `<b>${auxCuerpo}</b>`;
+
+    const info = await transporter.sendMail({
+        from: "'Folios' <folios@compraygana2024pds.com>",
+        to: params.email,
+        subject: params.asunto,
+        html: html
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+
+    return res.status(200).send({
+        status: "success",
+        message: "Enviado"
+    });
+}
+
 module.exports = {
     pruebaParticipante,
     register,
@@ -414,5 +479,7 @@ module.exports = {
     getAllParticipantes,
     deleteParti,
     getCounters,
-    getParticipanteRepeat
+    getParticipanteRepeat,
+    sendEmail,
+    getParticipantesMail
 }
