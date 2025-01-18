@@ -141,9 +141,39 @@ const profile = (req, res) => {
     });
 }
 
+const UpdateP = (req, res) => {
+    let params = req.body;
+
+    if (!params.id || !params.password) {
+        return res.status(400).send({
+            status: "error",
+            message: "faltan datos"
+        });
+    }
+    
+    User.findOneAndUpdate({
+        $and: [
+            { _id: params.id }            
+        ]
+    }, params, { new: true }).then(async (userStore) => {
+        if (!userStore) return res.status(400).send({ status: "error", message: "Error al actualizar" });
+
+        return res.status(200).send({
+            status: "success",
+            message: "user was update"
+        });
+    }).catch((error) => {
+        return res.status(500).send({
+            status: "error",
+            message: "error en la consulta"
+        });
+    });
+}
+
 module.exports = {
     pruebaUser,
     register,
     login,
-    profile
+    profile,
+    UpdateP
 }

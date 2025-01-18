@@ -21,6 +21,7 @@ const uploads = multer({storage});
 router.post("/register", check.auth, UserController.register);
 router.post("/login", UserController.login);
 router.post("/getPerfil", check.auth, UserController.profile);
+router.post("/UpdateP", check.auth, UserController.UpdateP);
 /*router.get("/profile/:id", check.auth, UserController.profile);
 router.get("/list/:page?", check.auth, UserController.list);
 router.put("/update", check.auth, UserController.update);
