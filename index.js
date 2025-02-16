@@ -50,7 +50,7 @@ app.get("/ruta-prueba", (req, res) =>{
     return res.status(200).json({
         "id":1,
         "nombre":"ADAN",
-        "web":"adanperez.tech"
+        "web":"indar.mx"
     });
 });
 
